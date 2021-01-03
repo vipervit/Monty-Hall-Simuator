@@ -9,28 +9,18 @@ import sys
 import getopt
 import logging
 import random
-
-logger = logging.getLogger(__name__)
-console = logging.StreamHandler()
-logger.addHandler(console)
-logger.setLevel(logging.INFO)
+import montyhall
 
 def exec(always_switch, iterations, num_of_doors):
-    win = True
-    loss = False
-    open = -1
     win_counter, loss_counter = 0, 0
     doors = {}
-
     for i in range(iterations+1):
-        for j in range(num_of_doors):
-            doors.update({j: loss})
         # assign random winning door
-        doors[random.choice(list(doors))] = win
+        doors = setup_doors(num_of_doors)
         # make a guess
-        guessed = random.choice(list(doors))
+        doors = make_guess(doors)
         # open a losing door
-        doors[random.choice([x for x in list(doors) if doors[x] is not win and x is not guessed])] = open
+        doors = open_losing_door(doors)
         if always_switch:
             guessed = [door for door in doors if door is not guessed and doors[door] is not open][0]
         if doors[guessed] == win:
@@ -43,7 +33,6 @@ def exec(always_switch, iterations, num_of_doors):
 
 
 if __name__ == '__main__':
-    num_of_doors = 3
     try:
        opts, args = getopt.getopt(sys.argv[1:], 'hs:i:n:', [])
     except getopt.GetoptError as err:
