@@ -12,11 +12,10 @@ logger.setLevel(logging.INFO)
 class statuses(Enum):
     win = 'CAR'
     loss = 'goat'
-    open = 'nope'
+    open = 'open'
+    guessed = 'guessed'
 
-num_of_doors = 3
-
-def setup_doors(num_of_doors):
+def setup_doors(num_of_doors=3):
     doors = {}
     for i in range(num_of_doors):
         doors.update({i: statuses.loss})
