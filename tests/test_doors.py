@@ -7,7 +7,7 @@ def test_get_prize_doors():
         if num_of_doors == 3:
             d = get_prize_doors()
         else:
-            d = get_prize_doors(num_of_doors = num_of_doors, num_of_prize_doors = num_of_prize_doors)
+            d = get_prize_doors(total_doors = num_of_doors, prize_doors = num_of_prize_doors)
         assert len(d) == num_of_doors, 'Wrong size of the returned dictionary.'
         assert list(d.values()).count(prize.win) == num_of_prize_doors, 'Wrong count of prizes.'
         assert list(d.values()).count(prize.bust) == num_of_doors - num_of_prize_doors, 'Wrong count of losing doors.'

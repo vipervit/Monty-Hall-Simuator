@@ -9,9 +9,9 @@ logger.addHandler(console)
 logger.setLevel(logging.INFO)
 
 
-class door():
+class door:
     id = None
-    hasPrize = False
+    prize = None
     isOpen = False
     markedGuessed = False
 
@@ -19,21 +19,25 @@ class prize(Enum):
     win = 'CAR!'
     bust = 'GOAT'
 
-def get_prize_doors(num_of_doors=3, num_of_prize_doors=1):
+def get_prize_doors(total_doors=3, prize_doors=1):
     doors = {}
-    for i in range(num_of_doors):
+    for i in range(total_doors):
         doors.update({i: prize.bust})
-    while list(doors.values()).count(prize.win) < num_of_prize_doors:
+    while list(doors.values()).count(prize.win) < prize_doors:
         doors[random.choice(range(len(doors)))] = random.choice([prize.win, prize.bust])
     return doors
 
-# def setup_doors(num_of_doors=3):
-#     doors = []
-#     for i in range(num_of_doors):
-#         door.id = i
-#         for j in range(num_of_prize_doors):
-#             door.hasPrize = random.choice()
-#
+def setup_doors(total_doors=3, prize_doors=1):
+    doors = []
+    prize_doors = get_prize_doors(total_doors=total_doors, prize_doors=prize_doors)
+    for i in range(total_doors):
+        d = door()
+        d.id = i
+        d.prize = prize_doors[i]
+        doors.append(d)
+    return doors
+
+
 # def make_guess(doors):
 #     doors[random.choice(list(doors))] = statuses.guessed
 #     return doors
