@@ -12,20 +12,22 @@ def test_get_prize_doors():
         assert list(d.values()).count(prize.win) == num_of_prize_doors, 'Wrong count of prizes.'
         assert list(d.values()).count(prize.bust) == num_of_doors - num_of_prize_doors, 'Wrong count of losing doors.'
 
-# def test_setup_doors():
-#     iterations = 100000
-#     win_counter, loss_counter = 0, 0
-#     for i in range(iterations):
-#         doors = setup_doors()
-#         if doors[0] == statuses.win:
-#             win_counter += 1
-#         if doors[0] == statuses.loss:
-#             loss_counter += 1
-#     win_rate = round(win_counter/iterations,2)
-#     loss_rate = round(loss_counter/iterations,2)
-#     assert win_rate >= 0.32 and win_rate <= 0.34, 'Wrong statistics for winnning doors.'
-#     assert  loss_rate >= 0.66 and loss_rate <= 0.68, 'Wrong statistics for losing doors.'
-#
+def test_setup_doors():
+    iterations = 100000
+    win_counter, loss_counter = 0, 0
+    for i in range(iterations):
+        doors = setup_doors()
+        if doors[0].prize == prize.win:
+            win_counter += 1
+        elif doors[0].prize == prize.bust:
+            loss_counter += 1
+        else:
+            assert win_counter > 0 and loss_counter > 0, 'Counters are not updated.'
+    win_rate = round(win_counter/iterations,2)
+    loss_rate = round(loss_counter/iterations,2)
+    assert (win_rate - 0.33) <= 0.01, 'Wrong statistics for winnning doors.'
+    assert  (loss_rate - 0.67) <= 0.01, 'Wrong statistics for losing doors.'
+
 # def test_make_guess():
 #     iterations = 100000
 #     ct_1, ct_2, ct_3 = 0,0,0
