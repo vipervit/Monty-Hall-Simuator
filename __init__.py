@@ -45,7 +45,3 @@ def make_guesses(doors, guesses=1):
             door.markedGuessed = True
             marked_guessed += 1
     return doors
-
-# def open_losing_door(doors, guessed):
-#     doors[random.choice([x for x in list(doors) if doors[x] is not statuses.win and x is not guessed])] = statuses.open
-#     return doors

@@ -1,3 +1,4 @@
+import random
 import montyhall
 from montyhall import *
 
@@ -12,36 +13,28 @@ def test_get_prize_doors():
         assert list(d.values()).count(prize.win) == num_of_prize_doors, 'Wrong count of prizes.'
         assert list(d.values()).count(prize.bust) == num_of_doors - num_of_prize_doors, 'Wrong count of losing doors.'
 
-def test_setup_doors():
+def setup_doors_testing(standard=True):
     iterations = 100000
+    max_doors = 10
+    precision = 1 # if increased, make sure number of iterations is also increased
+    if standard:
+        total_doors = 3
+        prize_doors = 1
+    else:
+        total_doors = random.randint(1, max_doors)
+        prize_doors = total_doors - random.randint(1, total_doors - 2)
     win_counter, loss_counter = 0, 0
     for i in range(iterations):
-        doors = setup_doors()
-        if doors[0].prize == prize.win:
+        doors = setup_doors(total_doors, prize_doors)
+        if random.choice(doors).prize == prize.win:
             win_counter += 1
-        elif doors[0].prize == prize.bust:
-            loss_counter += 1
         else:
-            assert win_counter > 0 and loss_counter > 0, 'Counters are not updated.'
-    win_rate = round(win_counter/iterations,2)
-    loss_rate = round(loss_counter/iterations,2)
-    assert (win_rate - 0.33) <= 0.01, 'Wrong statistics for winnning doors.'
-    assert  (loss_rate - 0.67) <= 0.01, 'Wrong statistics for losing doors.'
+            loss_counter += 1
+    assert round(win_counter / iterations, precision) == round(prize_doors / total_doors, precision), 'Wrong statistics for winnning doors.'
+    assert round(loss_counter / iterations, precision) == round((total_doors - prize_doors) / total_doors, precision), 'Wrong statistics for losing doors.'
 
-# def test_make_guess():
-#     iterations = 100000
-#     ct_1, ct_2, ct_3 = 0,0,0
-#     for i in range(iterations):
-#         doors = make_guess(setup_doors())
-#         if doors[0] == statuses.guessed:
-#             ct_1 += 1
-#         if doors[1] == statuses.guessed:
-#             ct_2 += 1
-#         if doors[2] == statuses.guessed:
-#             ct_3 += 1
-#         rate1 = round(ct_1/iterations)
-#         rate2 = round(ct_2/iterations)
-#         rate3 = round(ct_3/iterations)
-#         assert rate1 >= 0.32 and rate1 <= 0.33, 'Wrong statistics for first door.'
-#         assert rate2 >= 0.32 and rate2 <= 0.33, 'Wrong statistics for second door.'
-#         assert rate3 >= 0.32 and rate3 <= 0.33, 'Wrong statistics for third door.'
+def test_setup_doors_standard():
+    setup_doors_testing(standard=True)
+
+def test_setup_doors_non_standard():
+    setup_doors_testing(standard=False)
