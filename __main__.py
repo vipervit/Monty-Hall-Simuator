@@ -7,26 +7,22 @@ Monty Hall problem simulator. Parameters:
 """
 import sys
 import getopt
-import logging
 import random
 import montyhall
+from montyhall import logger
+from montyhall.funcs import *
 
 def exec(always_switch, iterations, num_of_doors):
     win_counter, loss_counter = 0, 0
     doors = {}
     for i in range(iterations+1):
-        # assign random winning door
         doors = setup_doors(num_of_doors)
-        # make a guess
-        doors = make_guess(doors)
-        # open a losing door
-        doors = open_losing_door(doors)
-        if always_switch:
-            guessed = [door for door in doors if door is not guessed and doors[door] is not open][0]
-        if doors[guessed] == win:
-            win_counter += 1
-        else:
-            loss_counter += 1
+        doors = make_guesses(doors)
+        doors = open_losing_doors(doors)
+        if always_switch == 'True':
+            raise NotImplementedError
+        win_counter += len([door for door in doors if door.isGuessed() and door.hasPrize()])
+        loss_counter +=  len([door for door in doors if door.isGuessed() and not door.hasPrize()])
     logger.info('Won: ' + str(win_counter) + ' ('+ str(round(win_counter*100/iterations,2)) + '%).')
     logger.info('Lost ' + str(loss_counter) + ' ('+ str(round(loss_counter*100/iterations,2)) + '%).')
     logger.info('Always switched the door: ' + always_switch + '.')
@@ -41,6 +37,9 @@ if __name__ == '__main__':
         sys.exit(2)
     for opt, args in opts:
         if opt == '-s':
+            if args != 'True' and args != 'False':
+                logger.critical('Can accept only True or False for -s.')
+                sys.exit()
             always_switch = args
         if opt == '-i':
             iterations = int(args)
