@@ -16,11 +16,9 @@ def exec(always_switch, iterations, num_of_doors):
     win_counter, loss_counter = 0, 0
     doors = {}
     for i in range(iterations+1):
-        doors = setup_doors(num_of_doors)
-        doors = make_guesses(doors)
-        doors = open_losing_doors(doors)
+        doors = prepare_doors(num_of_doors)
         if always_switch == 'True':
-            raise NotImplementedError
+            doors = switch_guesses(doors)
         win_counter += len([door for door in doors if door.isGuessed() and door.hasPrize()])
         loss_counter +=  len([door for door in doors if door.isGuessed() and not door.hasPrize()])
     logger.info('Won: ' + str(win_counter) + ' ('+ str(round(win_counter*100/iterations,2)) + '%).')

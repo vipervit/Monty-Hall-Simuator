@@ -36,3 +36,25 @@ def open_losing_doors(doors, total_doors_to_open=1):
             door.open()
             open_doors_count += 1
     return doors
+
+def prepare_doors(total=3, prizes=1, guess=1, open=1):
+    return open_losing_doors(make_guesses(setup_doors(total, prizes), guess), open)
+
+def find_guessed(doors):
+    while True:
+        door = random.choice(doors)
+        if door.isGuessed():
+            return door
+
+def switch_guesses(doors):
+    guessed_cnt = len([door for door in doors if door.isGuessed()])
+    switched_cnt = 0
+    while switched_cnt < guessed_cnt:
+        new = random.choice(doors)
+        old = find_guessed(doors)
+        switchable = [door.id for door in doors if not door.isOpen() and not door.isGuessed() and not new is old]
+        if new.id in switchable:
+            new.markGuessed()
+            old.unGuess()
+            switched_cnt += 1
+    return doors

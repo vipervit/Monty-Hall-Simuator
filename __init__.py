@@ -51,6 +51,9 @@ class door:
     def markGuessed(self):
         self._isGuessed = True
 
+    def unGuess(self):
+        self._isGuessed = False
+
     def isGuessed(self):
         return self._isGuessed
 
