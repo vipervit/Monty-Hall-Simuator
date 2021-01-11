@@ -5,23 +5,25 @@ from montyhall import *
 # ------- Auxiliary functions
 def setup_doors_testing(standard=True):
     iterations = 100000
-    max_doors = 10
+    doors_max = 10
+    doors_standard = 3
+    doors_min = doors_standard
     precision = 1 # if increased, make sure number of iterations is also increased
     if standard:
-        total_doors = 3
-        prize_doors = 1
+        doors_total = doors_standard
+        doors_prize = doors_standard - 2
     else:
-        total_doors = random.randint(1, max_doors)
-        prize_doors = total_doors - random.randint(1, total_doors - 2)
+        doors_total = random.randint(doors_min, doors_max)
+        doors_prize = doors_total - random.randint(1, doors_total - 2)
     win_counter, loss_counter = 0, 0
     for i in range(iterations):
-        doors = setup_doors(total_doors, prize_doors)
+        doors = setup_doors(doors_total, doors_prize)
         if random.choice(doors).prize == prize.win:
             win_counter += 1
         else:
             loss_counter += 1
-    assert round(win_counter / iterations, precision) == round(prize_doors / total_doors, precision), 'Wrong statistics for winnning doors.'
-    assert round(loss_counter / iterations, precision) == round((total_doors - prize_doors) / total_doors, precision), 'Wrong statistics for losing doors.'
+    assert round(win_counter / iterations, precision) == round(doors_prize / doors_total, precision), 'Wrong statistics for winnning doors.'
+    assert round(loss_counter / iterations, precision) == round((doors_total - doors_prize) / doors_total, precision), 'Wrong statistics for losing doors.'
 
 def make_guesses_testing(total_doors=3, guesses=1):
     count = 0
