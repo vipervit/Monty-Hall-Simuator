@@ -6,6 +6,11 @@ console = logging.StreamHandler()
 logger.addHandler(console)
 logger.setLevel(logging.INFO)
 
+DOORS_TOTAL_STANDARD = 3
+DOORS_PRIZE_STANDARD = 1
+DOORS_GUESS_STANDARD = 1
+DOORS_REVEAL_STANDARD = 1
+
 class door:
 
     def __init__(self):
