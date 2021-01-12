@@ -34,10 +34,10 @@ def exec(always_switch, iterations, doors_total=DOORS_TOTAL_STANDARD, doors_priz
 
 
 if __name__ == '__main__':
-    doors_total =  DOORS_TOTAL_STANDARD
-    doors_prize =  DOORS_PRIZE_STANDARD
-    doors_guess =  DOORS_GUESS_STANDARD
-    doors_reveal = DOORS_REVEAL_STANDARD
+    doors_total =  defaults.DOORS_TOTAL_STANDARD
+    doors_prize =  defaults.DOORS_PRIZE_STANDARD
+    doors_guess =  defaults.DOORS_GUESS_STANDARD
+    doors_reveal = default.DOORS_REVEAL_STANDARD
     try:
        opts, args = getopt.getopt(sys.argv[1:], 'hs:i:n:p:r:g:', [])
     except getopt.GetoptError as err:
