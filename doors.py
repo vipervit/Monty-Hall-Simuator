@@ -1,15 +1,21 @@
 import random
+from enum import IntEnum
 import montyhall
-from montyhall import door, prize, default_counts
+from montyhall import prize
+from montyhall.door import door
+
+class original(IntEnum):
+    total = 3
+    prized = 1
+    toguess = 1
+    toopen = 1
 
 class doors:
 
     def __init__(self):
         self._list = []
-        self._total = default_counts.total
-        self._prized = default_counts.prized
-        self._guessed = default_counts.guessed
-        self._revealed = default_counts.revealed
+        self._total = original.total
+        self._prized = original.prized
 
     @property
     def total(self):
@@ -27,21 +33,13 @@ class doors:
     def prized(self, val):
         self._prized = val
 
-    @property
-    def guessed(self):
-        return self._guessed
-
-    @guessed.setter
-    def guessed(self, val):
-        self._guessed = val
-
-    @property
-    def revealed(self):
-        return self._revealed
-
-    @revealed.setter
-    def revealed(self, val):
-        self._revealed = val
+    def __open__(self, to_open):
+        counter = 0
+        while counter < to_open:
+            door = random.choice(self._list)
+            if not door.is_open and not door.hasPrize and not door.is_guessed:
+                door.is_open = True
+                counter += 1
 
     def setup(self):
         for i in range(self.total):
@@ -49,14 +47,44 @@ class doors:
             dr.id = i
             dr.hasPrize = False
             self._list.append(dr)
-        self.__set_prized__()
-
-    def __set_prized__(self):
         for i in range(self.prized):
             random.choice(self._list).hasPrize = prize.win
 
     def get_random_guessed(self):
         while True:
             door = random.choice(self._list)
-            if door.isGuessed():
-                return door
+            if door.is_guessed:
+                return door.id
+
+    def get_ids_all(self):
+        return [door.id for door in self._list]
+
+    def get_ids_all_not_guessed(self):
+        return [door.id for door in self._list if not door.is_guessed]
+
+    def opened_count(self):
+        return len([door for door in self._list if door.is_open])
+
+    def guessed_count(self):
+        return len([door for door in self._list if door.is_guessed])
+
+    def get_ids_all_switchable(self):
+        return [door.id for door in self._list if not door.is_open and not door.is_guessed]
+
+    def switch_guesses(self, choices):
+        counter = 0
+        while counter < self.guessed_count():
+            new = self.objlist()[random.choice(choices)].id
+            old = self.get_random_guessed()
+            switchable = [door.id for door in self.objlist() if not door.is_open and not door.is_guessed and not new == old]
+            if new in switchable:
+                self.objlist()[new].is_guessed = True
+                self.objlist()[old].is_guessed = False
+                counter += 1
+
+    def set_guessed(self, idlist):
+        for id in idlist:
+            self._list[id].is_guessed = True
+
+    def objlist(self):
+        return self._list

@@ -1,13 +1,19 @@
 import montyhall
-from montyhall import default_counts
-from doors import doors
+from montyhall.doors import doors, original
 
 class host:
 
     def __init__(self):
+        self._toopen = None
         self.doors = doors()
 
-    def setup_doors(self, total=default_counts.total, prized=default_counts.prized):
-        self.doors.total = total
-        self.doors.prized = prized
-        self.doors.setup()
+    @property
+    def total_doors_to_open(self):
+        return self._toopen
+
+    @total_doors_to_open.setter
+    def total_doors_to_open(self, val):
+        self._toopen = val
+
+    def open_doors(self):
+        self.doors.__open__(self._toopen)

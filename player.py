@@ -1,32 +1,55 @@
+import random
 import montyhall
-from doors import doors
+from montyhall.doors import original
 
 class player:
 
     def __init__(self):
-        self._doors
+        self._toguess = original.toguess
+        self._guessrandomly = True
+        self._guesslist = []
+        self._doorlist = None
 
     @property
-    def guess_count(self):
-        return len([door for door in self._doors if door.isGuessed()])
+    def total_doors_to_guess(self):
+        return self._toguess
 
-    def get_doors(self, val):
-        self._doors = val
+    @total_doors_to_guess.setter
+    def total_doors_to_guess(self, val):
+        self._toguess = val
 
-    def make_guesses(self, guesses_to_make):
-        while self.guess_count < guesses_to_make:
-            door = random.choice(self._doors)
-            if not door.isGuessed():
-                door.markGuessed()
+    @property
+    def guess_mode(self):
+        return self._guessrandomly
 
-    def switch_guesses(self):
-        switched_cnt = 0
-        while switched_cnt < self.guess_count:
-            new = random.choice(doors)
-            old = self._doors.get_random_guessed()
-            switchable = [door.id for door in doors if not door.isOpen() and not door.isGuessed() and not new is old]
-            if new.id in switchable:
-                new.markGuessed()
-                old.unGuess()
-                switched_cnt += 1
-        return doors
+    @guess_mode.setter
+    def guess_mode(self, val):
+        self._guessrandomly = val
+
+    @property
+    def guess_list(self):
+        return self._guesslist
+
+    @guess_list.setter
+    def guess_list(self, val):
+        if not self._guessrandomly:
+            self._guesslist = val
+        else:
+            raise 'Unable to assign guesses: random guesses mode is set to True. '
+
+    @property
+    def doorlist(self):
+        return self._doorlist
+
+    @doorlist.setter
+    def doorlist(self, val):
+        self._doorlist = val
+
+    def make_guesses(self):
+        if self._guessrandomly:
+            counter = 0
+            while counter < self._toguess:
+                choice = random.choice(self._doorlist)
+                if not choice in self._guesslist:
+                    self._guesslist.append(choice)
+                    counter += 1
