@@ -19,11 +19,11 @@ class player:
         self._toguess = val
 
     @property
-    def guess_mode(self):
+    def guess_randomly(self):
         return self._guessrandomly
 
-    @guess_mode.setter
-    def guess_mode(self, val):
+    @guess_randomly.setter
+    def guess_randomly(self, val):
         self._guessrandomly = val
 
     @property

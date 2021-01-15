@@ -37,18 +37,24 @@ class doors:
         counter = 0
         while counter < to_open:
             door = random.choice(self._list)
-            if not door.is_open and not door.hasPrize and not door.is_guessed:
+            if not door.is_open and not door.hasPrize() and not door.is_guessed:
                 door.is_open = True
                 counter += 1
 
     def setup(self):
-        for i in range(self.total):
+        for i in range(self._total):
             dr = door()
             dr.id = i
-            dr.hasPrize = False
             self._list.append(dr)
-        for i in range(self.prized):
-            random.choice(self._list).hasPrize = prize.win
+        self.set_prized()
+
+    def set_prized(self):
+        counter = 0
+        while counter < self._prized:
+            door = random.choice(self._list)
+            if not door.hasPrize():
+                door.hides = prize.win
+                counter += 1
 
     def get_random_guessed(self):
         while True:
@@ -61,6 +67,12 @@ class doors:
 
     def get_ids_all_not_guessed(self):
         return [door.id for door in self._list if not door.is_guessed]
+
+    def total_count(self):
+        return len(self._list)
+
+    def prized_count(self):
+        return len([door for door in self._list if door.hasPrize()])
 
     def opened_count(self):
         return len([door for door in self._list if door.is_open])
