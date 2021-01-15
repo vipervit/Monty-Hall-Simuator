@@ -4,6 +4,7 @@ class TestDoors:
 
     total = 10
     prized = 5
+    toguess = 2
 
     x = doors()
 
@@ -14,12 +15,8 @@ class TestDoors:
         self.x.prized = self.prized
         assert self.x.total == self.total
         assert self.x.prized == self.prized
-        self.x.setup()
+        self.x.__setup__()
         assert self.x.total == self.total
         assert self.x.prized == self.prized
-        assert len(self.x.objlist()) == self.total
-        assert len([door for door in self.x.objlist() if door.hasPrize]) == self.prized
-
-
-    def test_set_guessed(self):
-        pass
+        assert self.x.total_count() == self.total
+        assert self.x.prized_count() == self.prized

@@ -1,6 +1,9 @@
 import random
 import montyhall
+from montyhall import logger
 from montyhall.doors import original
+
+
 
 class player:
 
@@ -27,11 +30,12 @@ class player:
         self._guessrandomly = val
 
     @property
-    def guess_list(self):
+    def guesses(self):
+        self._guesslist.sort()
         return self._guesslist
 
-    @guess_list.setter
-    def guess_list(self, val):
+    @guesses.setter
+    def guesses(self, val):
         if not self._guessrandomly:
             self._guesslist = val
         else:
@@ -45,11 +49,16 @@ class player:
     def doorlist(self, val):
         self._doorlist = val
 
+    def __reset_guesses__(self):
+        self._guesslist.clear()
+
     def make_guesses(self):
-        if self._guessrandomly:
-            counter = 0
-            while counter < self._toguess:
-                choice = random.choice(self._doorlist)
-                if not choice in self._guesslist:
-                    self._guesslist.append(choice)
+        counter = 0
+        self.__reset_guesses__()
+        if self.guess_randomly:
+            while counter < self.total_doors_to_guess:
+                choice = random.choice(self.doorlist)
+                if not choice in self.guesses:
+                    self.guesses.append(choice)
                     counter += 1
+        logger.debug(__name__ + '.make_guesses: ' + str(self.guesses))

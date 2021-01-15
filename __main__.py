@@ -1,10 +1,11 @@
 """
 Monty Hall problem simulator. Parameters:
 -s <true/false>: always switch door / never swtich door
--i <number of iterations>: number of iterations
+-i <number of plays>: number of plays
 -n <number of doors> : number of doors (3 by default if omitted, as in the original problem description)
 -p <number of prize doors>: number of doors behind which there is a prize
 -g <number of guesses>: number of doors the player may guess (1 in the original description)
+-d: debug mode
 -h: prints help and quits
 """
 import sys
@@ -17,11 +18,12 @@ from montyhall.doors import original
 from montyhall.host import host
 from montyhall.player import player
 
-def exec(always_switch, iterations, total, with_prize, to_guess, to_open):
+def exec(always_switch, plays, total, with_prize, to_guess, to_open):
 
     win_counter, loss_counter = 0, 0
+    win_rates, loss_rates = [], []
 
-    for i in range(iterations+1):
+    for i in range(plays):
 
         hst = host()
         plyr = player()
@@ -29,43 +31,55 @@ def exec(always_switch, iterations, total, with_prize, to_guess, to_open):
         hst.doors.total = total
         hst.doors.prized = with_prize
         hst.total_doors_to_open = to_open
-        hst.doors.setup()
+        hst.setup_doors()
 
+        plyr.doorlist = hst.doors.get_all()
         plyr.total_doors_to_guess = to_guess
-        plyr.doorlist = hst.doors.get_ids_all()
         plyr.make_guesses()
-        hst.doors.set_guessed(plyr.guess_list)
+        guesses = plyr.guesses
 
+        hst.accept_guesses(guesses)
         hst.open_doors()
 
         if always_switch == 'True':
-            plyr.doorlist = hst.doors.get_ids_all_switchable()
+
+            plyr.doorlist = hst.doors.get_all_switchable()
             plyr.make_guesses()
-            hst.doors.switch_guesses(plyr.guess_list)
+            new_guesses = plyr.guesses
 
-        win_counter += len([door for door in hst.doors.objlist() if door.is_guessed and door.hasPrize])
-        loss_counter +=  len([door for door in hst.doors.objlist() if door.is_guessed and not door.hasPrize])
+            hst.accept_guesses(new_guesses)
 
-    logger.info('Total doors: ' + str(hst.doors.total_count()))
-    logger.info('Prize doors: ' + str(hst.doors.prized_count()))
-    logger.info('Doors guessed: ' + str(hst.doors.guessed_count()))
-    logger.info('Doors opened: ' + str(hst.doors.opened_count()))
-    logger.info('Iterations: ' + str(iterations))
-    logger.info('Won: ' + str(win_counter) + ' ('+ str(round(win_counter*100/iterations,2)) + '%).')
-    logger.info('Lost ' + str(loss_counter) + ' ('+ str(round(loss_counter*100/iterations,2)) + '%).')
+        win_counter += hst.won_guesses_count()
+        win_rates.append(hst.win_rate())
+        loss_counter +=  hst.lost_guesses_count()
+        loss_rates.append(hst.loss_rate())
+
+    win_rate = round(sum(win_rates) / len(win_rates),2) * 100
+    loss_rate = round(sum(loss_rates) / len(loss_rates),2) * 100
+
+    logger.info('Total doors per play: ' + str(hst.doors.total_count()))
+    logger.info('Prize doors per play: ' + str(hst.doors.prized_count()))
+    logger.info('Doors guessed per play: ' + str(hst.doors.guessed_count()))
+    logger.info('Doors opened per play: ' + str(hst.doors.opened_count()))
+    logger.info('Plays: ' + str(plays))
+    logger.info('Total prizes available: ' + str(with_prize * plays))
+    logger.info('Total prizes won : %s', str(win_counter))
+    logger.info('Win rate: ' + str(win_rate))
+    logger.debug('Total prizes lost: %s', str(loss_counter))
+    logger.debug('Loss rate: ' + str(loss_rate))
     logger.info('Always switch the door: ' + always_switch + '.')
 
 
 if __name__ == '__main__':
 
-    iterations = 10000
+    plays = 10000
     total = int(original.total)
     with_prize = int(original.prized)
     to_open = int(original.toopen)
     to_guess = int(original.toguess)
 
     try:
-       opts, args = getopt.getopt(sys.argv[1:], 'hs:i:n:p:o:g:', [])
+       opts, args = getopt.getopt(sys.argv[1:], 'dhs:i:n:p:o:g:', [])
     except getopt.GetoptError as err:
         logger.error(err)
         logger.info(__doc__)
@@ -77,7 +91,7 @@ if __name__ == '__main__':
                 sys.exit()
             always_switch = args
         if opt == '-i':
-            iterations = int(args)
+            plays = int(args)
         if opt == '-n':
             total = int(args)
         if opt == '-g':
@@ -89,8 +103,10 @@ if __name__ == '__main__':
         if opt == '-h':
             logger.critical(__doc__)
             sys.exit()
-    if total - with_prize < 2 or total - to_guess < 2 or total - to_open < 2 or to_guess + to_open + with_prize >= total:
-        logger.critical('Total number of doors must be at least higher by 2 than number of prize doors, doors to guess, or doors to reveal.')
-        logger.critical('The sum of doors to be opened, doors with prizes and doors to guess may not be higher than the total number of doors.')
+        if opt == '-d':
+            logger.setLevel(logging.DEBUG)
+    if not total==original.total and not to_guess==original.toguess and not with_prize==original.prized and not to_open==original.toopen \
+           and total < 2 * to_guess + to_open + with_prize:
+        logger.critical('ERROR')
         sys.exit()
-    exec(always_switch, iterations, total, with_prize, to_guess, to_open)
+    exec(always_switch, plays, total, with_prize, to_guess, to_open)
