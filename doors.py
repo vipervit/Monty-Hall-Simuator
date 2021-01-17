@@ -1,14 +1,7 @@
 import random
-from enum import IntEnum
 import montyhall
-from montyhall import logger, prize
+from montyhall import logger, prize, original
 from montyhall.door import door
-
-class original(IntEnum):
-    total = 3
-    prized = 1
-    toguess = 1
-    toopen = 1
 
 class doors:
 

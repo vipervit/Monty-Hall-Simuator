@@ -12,36 +12,37 @@ import sys
 import logging
 import getopt
 import random
+from enum import IntEnum
 import montyhall
-from montyhall import logger
+from montyhall import logger, params
 from montyhall.doors import original
 from montyhall.host import host
 from montyhall.player import player
 
-def exec(always_switch, plays, total, with_prize, to_guess, to_open):
+def exec(params):
 
     win_counter, loss_counter = 0, 0
     win_rates, loss_rates = [], []
 
-    for i in range(plays):
+    for i in range(params.plays):
 
         hst = host()
         plyr = player()
 
-        hst.doors.total = total
-        hst.doors.prized = with_prize
-        hst.total_doors_to_open = to_open
+        hst.doors.total = params.total
+        hst.doors.prized = params.prized
+        hst.total_doors_to_open = params.open
         hst.setup_doors()
 
         plyr.doorlist = hst.doors.get_all()
-        plyr.total_doors_to_guess = to_guess
+        plyr.total_doors_to_guess = params.guess
         plyr.make_guesses()
         guesses = plyr.guesses
 
         hst.accept_guesses(guesses)
         hst.open_doors()
 
-        if always_switch == 'True':
+        if params.always_switch == 'True':
 
             plyr.doorlist = hst.doors.get_all_switchable()
             plyr.make_guesses()
@@ -61,22 +62,15 @@ def exec(always_switch, plays, total, with_prize, to_guess, to_open):
     logger.info('Prize doors per play: ' + str(hst.doors.prized_count()))
     logger.info('Doors guessed per play: ' + str(hst.doors.guessed_count()))
     logger.info('Doors opened per play: ' + str(hst.doors.opened_count()))
-    logger.info('Plays: ' + str(plays))
-    logger.info('Total prizes available: ' + str(with_prize * plays))
+    logger.info('Plays: ' + str(params.plays))
+    logger.info('Total prizes available: ' + str(params.prized * params.plays))
     logger.info('Total prizes won : %s', str(win_counter))
     logger.info('Win rate: ' + str(win_rate))
     logger.debug('Total prizes lost: %s', str(loss_counter))
     logger.debug('Loss rate: ' + str(loss_rate))
-    logger.info('Always switch the door: ' + always_switch + '.')
-
+    logger.info('Always switch the door: ' + str(params.always_switch) + '.')
 
 if __name__ == '__main__':
-
-    plays = 10000
-    total = int(original.total)
-    with_prize = int(original.prized)
-    to_open = int(original.toopen)
-    to_guess = int(original.toguess)
 
     try:
        opts, args = getopt.getopt(sys.argv[1:], 'dhs:i:n:p:o:g:', [])
@@ -91,22 +85,19 @@ if __name__ == '__main__':
                 sys.exit()
             always_switch = args
         if opt == '-i':
-            plays = int(args)
+            params.plays = int(args)
         if opt == '-n':
-            total = int(args)
+            params.total = int(args)
         if opt == '-g':
-            to_guess = int(args)
+            params.guess = int(args)
         if opt == '-o':
-            to_open = int(args)
+            params.open = int(args)
         if opt == '-p':
-            with_prize = int(args)
+            params.prized = int(args)
         if opt == '-h':
             logger.critical(__doc__)
             sys.exit()
         if opt == '-d':
             logger.setLevel(logging.DEBUG)
-    if not total==original.total and not to_guess==original.toguess and not with_prize==original.prized and not to_open==original.toopen \
-           and total < 2 * to_guess + to_open + with_prize:
-        logger.critical('ERROR')
-        sys.exit()
-    exec(always_switch, plays, total, with_prize, to_guess, to_open)
+
+    exec(params)
