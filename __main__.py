@@ -13,14 +13,22 @@ import logging
 import getopt
 import random
 from enum import IntEnum
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import pandas as pd
 import montyhall
 from montyhall import logger, params
 from montyhall.doors import original
 from montyhall.host import host
 from montyhall.player import player
 
+def plot(data):
+    pd.Series(data).plot(kind='barh')
+    plt.show()
+
 def exec(params):
 
+    wins, losses = counts_init(params.plays), counts_init(params.plays)
     win_counter, loss_counter = 0, 0
     win_rates, loss_rates = [], []
 
@@ -70,6 +78,8 @@ def exec(params):
     logger.debug('Loss rate: ' + str(loss_rate))
     logger.info('Always switch the door: ' + str(params.always_switch) + '.')
 
+    plot({'Wins': win_counter, 'Losses': loss_counter})
+
 if __name__ == '__main__':
 
     try:
@@ -83,7 +93,7 @@ if __name__ == '__main__':
             if args != 'True' and args != 'False':
                 logger.critical('Can accept only True or False for -s.')
                 sys.exit()
-            always_switch = args
+            params.always_switch = args
         if opt == '-i':
             params.plays = int(args)
         if opt == '-n':
