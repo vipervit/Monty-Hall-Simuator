@@ -83,7 +83,7 @@ if __name__ == '__main__':
             if args != 'True' and args != 'False':
                 logger.critical('Can accept only True or False for -s.')
                 sys.exit()
-            always_switch = args
+            params.always_switch = args
         if opt == '-i':
             params.plays = int(args)
         if opt == '-n':
